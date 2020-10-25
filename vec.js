@@ -6,6 +6,22 @@ function mult_scalar(vec, s){
 	return o;
 }
 
+//find sum of two vectors
+function add(a, b){
+	let o = [];
+	for(let i = 0; i < a.length; i++)
+		o.push(a[i]+b[i]);
+	return o;
+}
+
+//find difference of two vectors
+function sub(a, b){
+	let o = [];
+	for(let i = 0; i < a.length; i++)
+		o.push(a[i]-b[i]);
+	return o;
+}
+
 //find magnitude of vector
 function mag(vec){ 
 	let s = 0;
@@ -32,7 +48,19 @@ function midpoint(a, b){
 	return o;
 }
 
+//find dot product of two vectors
+function dot(a, b){
+	let o = 0;
+	for(let i = 0; i < a.length; i++)
+		o += a[i]*b[i];
+	return o;
+}
 
-
+//find cross product of 3d vectors
+function cross3(a, b){
+	return [a[1]*b[2] - a[2]*b[1],
+			a[2]*b[0] - a[0]*b[2],
+			a[0]*b[1] - a[1]*b[0]];
+}
 
 
