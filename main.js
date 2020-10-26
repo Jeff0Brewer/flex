@@ -17,7 +17,7 @@ function main(){
 	u_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
 
 	fovy = 50;
-	view_matrix.set_camera([0, 0, 7], [0, 0, 0], [0, 1, 0]);
+	view_matrix.set_camera([0, 0, 6], [0, 0, 0], [0, 1, 0]);
 	proj_matrix.set_perspective(fovy, canvas.width/canvas.height, .01, 500);
 	gl.uniformMatrix4fv(u_ModelMatrix, false, model_matrix.e);
 	gl.uniformMatrix4fv(u_ViewMatrix, false, view_matrix.e);
