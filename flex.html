@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>flex</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body onload="main()">
+	<canvas class="c" id="c"></canvas>
+
+	<script id="v_iso" type="glsl">
+		attribute vec4 a_Position;
+		uniform mat4 u_ModelMatrix;
+		uniform mat4 u_ViewMatrix;
+		uniform mat4 u_ProjMatrix;
+
+		void main(){
+			gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * a_Position;
+		}
+	</script>
+	<script id="f_iso" type="glsl">
+		void main(){
+			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+		}
+	</script>
+	<script src="global_gl.js"></script>
+	<script src="gl.js"></script>
+	<script src="vec.js"></script>
+	<script src="mat.js"></script>
+	<script src="isosphere.js"></script>
+	<script src="iso_vis.js"></script>
+	<script src="main.js"></script>
+</body>
