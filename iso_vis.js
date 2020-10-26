@@ -76,6 +76,7 @@ class Iso{
 		gl.enableVertexAttribArray(this.a_Flare);
 
 		this.u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+		this.u_Alpha = gl.getUniformLocation(gl.program, 'u_Alpha');
 	}
 
 	draw(){
@@ -94,7 +95,9 @@ class Iso{
 		let rot = new Mat4();
 		rot.rotate(this.rotation.angle, this.rotation.axis);
 		gl.uniformMatrix4fv(this.u_ModelMatrix, false, rot.e);
+		gl.uniform1f(this.u_Alpha, 1.0);
 		gl.drawArrays(gl.LINES, 0, this.iso.length);
+		gl.uniform1f(this.u_Alpha, .7);
 		gl.drawArrays(gl.TRIANGLES, this.iso.length, this.iso.length*3);
 	}
 
@@ -135,3 +138,4 @@ class Iso{
 		}
 	}
 }
+
