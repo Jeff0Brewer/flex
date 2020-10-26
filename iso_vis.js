@@ -4,7 +4,7 @@ class Iso{
 		noise.seed(Math.random());
 		this.p_fpv = p_fpv;
 		this.p = {
-			scale: [.2, 1, 2, 3, 4, 5],
+			scale: [.4, 2, 4, 6, 8, 10],
 			weight: norm([1, 1, 1, 1, 1, 1]),
 			pos: 0,
 			speed: .2,
@@ -15,6 +15,12 @@ class Iso{
 			axis: [0, 0, 0],
 			angle: 40
 		};
+		this.scale = 1.0;
+		this.smoothing = {
+			scale: .25,
+			rotation: .9
+		};
+
 		this.iso = gen_iso(2);
 		this.v = [];
 		for(let i = 0; i < this.iso.length; i++){
@@ -129,35 +135,40 @@ class Iso{
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_flr_buf);
 		gl.bufferData(gl.ARRAY_BUFFER, this.flr_buffer, gl.DYNAMIC_DRAW);
 
-		let rot = new Mat4();
-		rot.rotate(this.rotation.angle, this.rotation.axis);
-		gl.uniformMatrix4fv(this.u_ModelMatrix, false, rot.e);
+		let trans = new Mat4();
+		trans.scale(this.scale, this.scale, this.scale);
+		trans.rotate(this.rotation.angle, this.rotation.axis);
+		gl.uniformMatrix4fv(this.u_ModelMatrix, false, trans.e);
 		gl.uniform1f(this.u_Alpha, 1.0);
 		gl.drawArrays(gl.LINES, 0, this.iso.length);
 		gl.drawArrays(gl.LINES, this.iso.length*4, this.scl_buffer.length - this.iso.length*4);
-		gl.uniform1f(this.u_Alpha, .7);
+		gl.uniform1f(this.u_Alpha, .6);
 		gl.drawArrays(gl.TRIANGLES, this.iso.length, this.iso.length*3);
 	}
 
-	update(elapsed){
+	update(elapsed, fft){
 		for(let i = 0; i < 3; i++)
 			this.p.apos[i] += this.p.aspeed[i]*elapsed/1000;
 		this.rotation.axis = [noise.perlin3(this.p.apos[0], this.p.apos[1], this.p.apos[2]), noise.perlin3(this.p.apos[1], this.p.apos[2], this.p.apos[0]), (noise.perlin3(this.p.apos[0], this.p.apos[2], this.p.apos[1]) + 1)/2];
+		this.rotation.angle = this.rotation.angle*this.smoothing.rotation + exp_map(fft.sub_pro(0, 1), [0, 255], [0, 45], 1)*(1 - this.smoothing.rotation);
+		this.scale = this.scale*this.smoothing.scale + exp_map(fft.sub_pro(0, .15), [0, 255], [1, 1.5], 2)*(1 - this.smoothing.scale);
 
 		this.p.pos += this.p.speed*elapsed/1000;
 		let scales = [];
 		for(let i = 0; i < this.v.length; i++){
 			scales.push(0);
 			for(let j = 0; j < this.p.scale.length; j++){
-				scales[i] += noise.perlin3((this.v[i][0] + this.p.pos)*this.p.scale[j], this.v[i][1]*this.p.scale[j], this.v[i][2]*this.p.scale[j])*this.p.weight[j];
+				let amp = exp_map(fft.sub_pro(j/this.p.scale.length, (j+1)/this.p.scale.length), [0, 255], [0, 1], 1.5);
+				scales[i] += amp*noise.perlin3((this.v[i][0] + this.p.pos)*this.p.scale[j], this.v[i][1]*this.p.scale[j], this.v[i][2]*this.p.scale[j])*this.p.weight[j];
 			}
-			scales[i] = scales[i]*.4 + 1;
+			scales[i] = scales[i]*1 + 1;
 		}
 		for(let i = 0; i < this.scl_buffer.length; i++){
 			this.scl_buffer[i] = scales[this.v_inds[i]];
 		}
 
-		let flare = .05;
+		let flare = exp_map(fft.sub_pro(0, .1), [0, 255], [0, .1], 3);
+		flare = flare*map(flare, [0, .1], [1, .5]) + flare*map(flare, [0, .1], [0, .5])*Math.random();
 		let old = this.flr_buffer.slice();
 		for(let i = this.iso.length + 1; i < this.iso.length*4; i += 6){
 			this.flr_buffer[i+1] = flare;
@@ -165,7 +176,7 @@ class Iso{
 			this.flr_buffer[i+3] = flare;
 		}
 		for(let i = this.iso.length*4; i < this.flr_buffer.length; i += 2){
-			this.flr_buffer[i] = Math.pow(scales[this.v_inds[i]] - 1, .9);
+			this.flr_buffer[i] = map(Math.abs(scales[this.v_inds[i]] - 1), [0, 1], [0, 1]);
 		}
 	}
 }
