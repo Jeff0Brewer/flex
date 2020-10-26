@@ -9,12 +9,15 @@
 
 	<script id="v_iso" type="glsl">
 		attribute vec4 a_Position;
+		attribute float a_Scale;
+		attribute float a_Flare;
+
 		uniform mat4 u_ModelMatrix;
 		uniform mat4 u_ViewMatrix;
 		uniform mat4 u_ProjMatrix;
 
 		void main(){
-			gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * a_Position;
+			gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * vec4(a_Position.xyz*a_Scale + a_Position.xyz*a_Flare, a_Position.w);
 		}
 	</script>
 	<script id="f_iso" type="glsl">
@@ -22,6 +25,7 @@
 			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 		}
 	</script>
+	<script src="noise.js"></script>
 	<script src="global_gl.js"></script>
 	<script src="gl.js"></script>
 	<script src="vec.js"></script>
