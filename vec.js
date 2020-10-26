@@ -72,4 +72,10 @@ function vec_equal(a, b){
 	return true;
 }
 
-
+//find average value of vector elements
+function vec_avg(vec){
+	let s = 0;
+	for(let i = 0; i < vec.length; i++)
+		s += vec[i];
+	return s/vec.length;
+}
