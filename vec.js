@@ -63,4 +63,13 @@ function cross3(a, b){
 			a[0]*b[1] - a[1]*b[0]];
 }
 
+//check if two vectors are equal
+function vec_equal(a, b){
+	for(let i = 0; i < a.length; i++){
+		if(a[i] != b[i]) 
+			return false;
+	}
+	return true;
+}
+
 
