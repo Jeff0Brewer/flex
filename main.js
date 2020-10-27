@@ -14,6 +14,7 @@ var fft = null;
 function main(){
 	//setup gl and uniforms
 	setup_gl();
+	make_tex_fb();
 	switch_shader(0);
 	u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
 	u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
@@ -27,7 +28,10 @@ function main(){
 	gl.uniformMatrix4fv(u_ProjMatrix, false, proj_matrix.e);
 
 	//initialize visualizations
+	switch_shader(0);
 	iso = new Iso(p_fpv);
+	switch_shader(1);
+	fil = new TexFill(2, 2);
 
 	//start drawing loop
 	let last_t = Date.now();
@@ -41,7 +45,16 @@ function main(){
 		if(elapsed < 500 && fft != null){
 			fft.get_data();
 			iso.update(elapsed, fft);
+
+			switch_fb(1);
+			switch_shader(0);
+			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 			iso.draw();
+
+			switch_fb(0);
+			switch_shader(1);
+			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+			fil.draw();
 		}
 
 		requestAnimationFrame(tick, canvas);
@@ -52,7 +65,7 @@ function main(){
 //initialize audio analyser
 document.body.onmousedown = function(){
 	if(fft == null){
-		fft = new FFT(4096, .5, 'Underground - NITRXMANE.mp3');
+		fft = new FFT(4096, .5, 'mix.mp3');
 		fft.play_audio();
 	}
 }
@@ -66,5 +79,7 @@ document.body.onresize = function(){
 		proj_matrix.set_perspective(fovy, canvas.width/canvas.height, .01, 500);
 		switch_shader(0);
 		gl.uniformMatrix4fv(u_ProjMatrix, false, proj_matrix.e);
+		remove_fb(1);
+		make_tex_fb();
 	}
 }
