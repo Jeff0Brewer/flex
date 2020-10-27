@@ -152,7 +152,7 @@ class Iso{
 
 	update(elapsed, fft){
 		let scale_amp = 1.5;
-		let flare_amp = .1;
+		let flare_amp = .125;
 
 		for(let i = 0; i < 3; i++)
 			this.p.apos[i] += this.p.aspeed[i]*elapsed/1000;
@@ -174,7 +174,7 @@ class Iso{
 			this.scl_buffer[i] = scales[this.v_inds[i]];
 		}
 
-		let flare = exp_map(fft.sub_pro(0, .1), [0, 255], [0, flare_amp], 3);
+		let flare = exp_map(fft.sub_pro(0, .1), [0, 255], [0, flare_amp], 4);
 		flare = flare*map(flare, [0, flare_amp], [1, .5]) + flare*map(flare, [0, .1], [0, .5])*Math.random();
 		let old = this.flr_buffer.slice();
 		for(let i = this.iso.length + 1; i < this.iso.length*4; i += 6){
