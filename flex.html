@@ -31,6 +31,28 @@
 			gl_FragColor = v_Color;
 		}
 	</script>
+	<script id="v_tex" type="glsl">
+		attribute vec2 a_Position;
+		attribute vec2 a_TexCoord;
+
+		varying vec2 v_TexCoord;
+
+		void main(){
+			gl_Position = vec4(a_Position.xy, 0.0, 1.0);
+			v_TexCoord = a_TexCoord;
+		}
+	</script>
+	<script id="f_tex" type="glsl">
+		precision highp float;
+
+		uniform sampler2D u_Sampler;
+
+		varying vec2 v_TexCoord;
+
+		void main(){
+			gl_FragColor = vec4(texture2D(u_Sampler, v_TexCoord).xyz, 1.0);
+		}
+	</script>
 	<script src="noise.js"></script>
 	<script src="global_gl.js"></script>
 	<script src="gl.js"></script>
@@ -39,6 +61,7 @@
 	<script src="mat.js"></script>
 	<script src="audio_analysis.js"></script>
 	<script src="isosphere.js"></script>
+	<script src="tex_fill.js"></script>
 	<script src="iso_vis.js"></script>
 	<script src="main.js"></script>
 </body>
