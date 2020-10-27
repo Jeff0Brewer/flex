@@ -46,11 +46,13 @@
 		precision highp float;
 
 		uniform sampler2D u_Sampler;
+		uniform float u_Spray;
 
 		varying vec2 v_TexCoord;
 
 		void main(){
-			gl_FragColor = vec4(texture2D(u_Sampler, v_TexCoord).xyz, 1.0);
+			vec2 dir = v_TexCoord.xy - 0.5;
+			gl_FragColor = vec4(texture2D(u_Sampler, v_TexCoord).x, texture2D(u_Sampler, v_TexCoord.xy + u_Spray*dir.xy).y, texture2D(u_Sampler, v_TexCoord.xy - u_Spray*dir.xy).z, 1.0);
 		}
 	</script>
 	<script src="noise.js"></script>
