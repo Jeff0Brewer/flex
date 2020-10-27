@@ -54,7 +54,7 @@ function main(){
 			switch_fb(0);
 			switch_shader(1);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
-			fil.draw();
+			fil.draw(fft);
 		}
 
 		requestAnimationFrame(tick, canvas);
