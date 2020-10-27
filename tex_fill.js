@@ -34,15 +34,18 @@ class TexFill{
 		this.a_TexCoord = gl.getAttribLocation(gl.program, 'a_TexCoord');
 		gl.vertexAttribPointer(this.a_TexCoord, this.t_fpv, gl.FLOAT, false, this.fsize*this.t_fpv, 0);
 		gl.enableVertexAttribArray(this.a_TexCoord);
+
+		this.u_Spray = gl.getUniformLocation(gl.program, 'u_Spray');
 	}
 
-	draw(){
+	draw(fft){
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_pos_buf);
 		gl.vertexAttribPointer(this.a_Position, this.p_fpv, gl.FLOAT, false, this.fsize*this.p_fpv, 0);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_tex_buf);
 		gl.vertexAttribPointer(this.a_TexCoord, this.t_fpv, gl.FLOAT, false, this.fsize*this.t_fpv, 0);
 
+		gl.uniform1f(this.u_Spray, exp_map(fft.sub_pro(0, .1), [0, 255], [0, .05 + Math.random()*.02], 8));
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, this.pos_buffer.length/this.p_fpv);
 	}
 }
