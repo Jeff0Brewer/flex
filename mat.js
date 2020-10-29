@@ -47,7 +47,7 @@ Mat4.prototype.set_perspective = function(fovy, aspect, near, far){
 Mat4.prototype.set_camera = function(camera, focus, up){
 	let f = norm(sub(focus, camera));
 	let s = norm(cross3(f, up));
-	let u = cross(s, f);
+	let u = cross3(s, f);
 
 	this.e[0] = s[0];
 	this.e[1] = u[0];
