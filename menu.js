@@ -15,9 +15,7 @@ var Menu = function(){
 	let menu = this;
 	document.getElementById('file_input').onchange = function(){
 		let files = this.files;
-
 		menu.clear_items();
-
 		let inds = [];
 		for(let i = 0; i < files.length; i++)
 			inds.push(i);
@@ -41,7 +39,11 @@ Menu.prototype.select_item = function(i){
 		}
 		this.selected_ind = i;
 		this.items[i][2].classList.add('selected');
-		if(this.fft != null) this.fft.change_file(this.items[i][1]);
+		this.items[i][2].childNodes[3].classList.remove('hidden');
+		if(this.fft != null && this.fft.change_file(this.items[i][1])){
+			this.items[i][2].childNodes[3].childNodes[1].classList.add('hidden');
+			this.items[i][2].childNodes[3].childNodes[3].classList.remove('hidden');
+		}
 	}
 }
 
@@ -53,10 +55,12 @@ Menu.prototype.add_item = function(name, file){
 	item.onmouseenter = function(){
 		this.childNodes[3].classList.remove('hidden');
 	}
+	item.id = this.items.length.toString();
 	item.onmouseleave = function(){
-		this.childNodes[3].classList.add('hidden');
+		if(menu.selected_ind != parseFloat(this.id))
+			this.childNodes[3].classList.add('hidden');
 	}
-	item.childNodes[3].id = this.items.length.toString();
+	item.childNodes[3].id = item.id;
 	item.childNodes[3].onmousedown = function(){
 		if(this.childNodes[1].classList.contains('hidden')){
 			if(menu.fft != null){
@@ -109,10 +113,9 @@ Menu.prototype.add_item = function(name, file){
 //remove song with the given name
 Menu.prototype.clear_items = function(){
 	this.selected_ind = -1;
-	this.inds = [];
-	while(this.items.length > 0){
-		this.s_l.removeChild(this.items[0][2]);
-		this.items.splice(0);
+	this.items = [];
+	while(this.s_l.firstChild){
+		this.s_l.removeChild(this.s_l.firstChild);
 	}
 }
 
