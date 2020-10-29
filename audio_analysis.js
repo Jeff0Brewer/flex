@@ -1,15 +1,39 @@
 //audio analyser object
-var FFT = function(size, smooth, file){
+var FFT = function(){
+	this.actx = null;
+	this.size = 4096;
+	this.raw_data = new Uint8Array(this.size).fill(0);
+	this.pro_data = new Array(Math.ceil(Math.sqrt(Math.floor(this.raw_data.length*0.7)))).fill(0);
+}
+
+//initialize the audio context
+FFT.prototype.init_ctx = function(file){
 	this.actx = new AudioContext();
 	this.audio = new Audio(file);
 	this.audio_src = this.actx.createMediaElementSource(this.audio);
 	this.analyser = this.actx.createAnalyser();
-	this.analyser.fftSize = size;
+	this.analyser.fftSize = this.size;
 	this.analyser.smoothingTimeConstant = .5;
 	this.audio_src.connect(this.analyser);
 	this.audio_src.connect(this.actx.destination);
-	this.raw_data = new Uint8Array(size);
-	this.pro_data = new Array(Math.ceil(Math.sqrt(Math.floor(this.raw_data.length*0.7))));
+}
+
+//change the audio file
+FFT.prototype.change_file = function(file){
+	let play = false;
+	if(this.audio.paused == false){
+		this.audio.pause();
+		play = true;
+	}
+
+	this.audio = new Audio(file);
+	this.audio_src = this.actx.createMediaElementSource(this.audio);
+	this.audio_src.connect(this.analyser);
+	this.audio_src.connect(this.actx.destination);
+
+	if(play)
+		this.audio.play();
+	return play;
 }
 
 //get data from attached audio object
@@ -34,4 +58,21 @@ FFT.prototype.sub_pro = function(s, e){
 //play attached audio
 FFT.prototype.play_audio = function(){
 	this.audio.play();
+}
+
+//pause attached audio
+FFT.prototype.pause_audio = function(){
+	this.audio.pause();
+}
+
+//set percentage completion of attached audio
+FFT.prototype.set_progress = function(per){
+	per = per > 0 ? per : 0;
+	per = per < 100 ? per : 100;
+	this.audio.currentTime = this.audio.duration*per/100;
+}
+
+//get percentage completion of attached audio
+FFT.prototype.get_progress = function(){
+	return (this.audio.currentTime / this.audio.duration)*100;
 }
