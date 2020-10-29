@@ -32,6 +32,7 @@ Menu.prototype.select_item = function(i){
 	if(i != this.selected_ind){
 		if(this.selected_ind >= 0) {
 			this.items[this.selected_ind][2].classList.remove('selected');
+			this.items[this.selected_ind][2].childNodes[3].classList.add('hidden');
 			if(this.items[this.selected_ind][2].childNodes[3].childNodes[1].classList.contains('hidden')){
 				this.items[this.selected_ind][2].childNodes[3].childNodes[1].classList.remove('hidden')
 				this.items[this.selected_ind][2].childNodes[3].childNodes[3].classList.add('hidden')
