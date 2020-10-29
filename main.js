@@ -9,7 +9,13 @@ canvas.width = window.innerWidth*window.devicePixelRatio;
 canvas.height = window.innerHeight*window.devicePixelRatio;
 
 //initialize audio analyser variable
-var fft = null;
+var fft = new FFT();
+
+//initialize menu control object
+let file = '00_music/mix3.mp3'
+var menu = new Menu();
+menu.add_item(file.substring(0, file.lastIndexOf('.')), file);
+menu.select_item(0);
 
 function main(){
 	//setup gl and uniforms
@@ -42,10 +48,13 @@ function main(){
 		last_t = this_t;
 
 		//update and draw visualizations
-		if(elapsed < 500 && fft != null){
-			fft.get_data();
+		if(elapsed < 500){
+			if(fft.actx != null){
+				fft.get_data();
+				menu.progress();
+			}
 			iso.update(elapsed, fft);
-
+			
 			switch_fb(1);
 			switch_shader(0);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -64,9 +73,9 @@ function main(){
 
 //initialize audio analyser
 document.body.onmousedown = function(){
-	if(fft == null){
-		fft = new FFT(4096, .5, 'mix.mp3');
-		fft.play_audio();
+	if(fft.actx == null){
+		fft.init_ctx(file);
+		menu.attach_fft(fft);
 	}
 }
 
