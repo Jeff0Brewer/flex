@@ -86,7 +86,7 @@ class Iso{
 		for(let i = 0; i < this.v.length; i++){
 			this.v_inds.push(i);
 			this.v_inds.push(i);
-			let v = mult_scalar(this.v[i], 1.25);
+			let v = mult_scalar(this.v[i], 1.3);
 			for(let j = 0; j < v.length; j++, pos_ind++){
 				this.pos_buffer[pos_ind] = v[j];
 			}
@@ -158,7 +158,7 @@ class Iso{
 			this.p.apos[i] += this.p.aspeed[i]*elapsed/1000;
 		this.rotation.axis = [noise.perlin3(this.p.apos[0], this.p.apos[1], this.p.apos[2]), noise.perlin3(this.p.apos[1], this.p.apos[2], this.p.apos[0]), (noise.perlin3(this.p.apos[0], this.p.apos[2], this.p.apos[1]) + 1)/2];
 		this.rotation.angle = this.rotation.angle*this.smoothing.rotation + exp_map(fft.sub_pro(0, 1), [0, 255], [0, 45], 1)*(1 - this.smoothing.rotation);
-		this.scale = this.scale*this.smoothing.scale + exp_map(fft.sub_pro(0, .15), [0, 255], [1, 1.5], 2)*(1 - this.smoothing.scale);
+		this.scale = this.scale*this.smoothing.scale + exp_map(fft.sub_pro(0, .2), [0, 255], [1, 2.15], 3)*(1 - this.smoothing.scale);
 
 		this.p.pos += this.p.speed*elapsed/1000;
 		let scales = [];
@@ -183,7 +183,7 @@ class Iso{
 			this.flr_buffer[i+3] = flare;
 		}
 		for(let i = this.iso.length*4; i < this.flr_buffer.length; i += 2){
-			this.flr_buffer[i] = map(Math.abs(scales[this.v_inds[i]] - 1), [0, scale_amp], [0, scale_amp]);
+			this.flr_buffer[i] = exp_map(Math.abs(scales[this.v_inds[i]] - 1), [0, scale_amp], [0, 2*scale_amp], 1.25);
 		}
 	}
 }
