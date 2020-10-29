@@ -1,3 +1,4 @@
+var gl;
 var programs = [];
 var framebuffers = [[null, null]];
 var p_fpv = 3;
