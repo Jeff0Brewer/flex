@@ -51,8 +51,8 @@ function main(){
 		if(elapsed < 500){
 			if(fft.actx != null){
 				fft.get_data();
-				menu.progress();
 			}
+			menu.update(elapsed);
 			iso.update(elapsed, fft);
 			
 			switch_fb(1);
@@ -70,6 +70,7 @@ function main(){
 	}
 	tick();
 }
+
 
 //initialize audio analyser
 document.body.onmousedown = function(){
