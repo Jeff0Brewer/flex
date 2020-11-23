@@ -28,8 +28,9 @@ html, body{
 
 .song_list{
 	position: relative;
+	float: left;
 	width: 325px;
-	max-height: 50vh;
+	max-height: 70vh;
 	overflow-y: scroll;
 	overflow-x: hidden;
 	padding-right: 20px;
@@ -43,12 +44,25 @@ html, body{
 
 	color: white;
 	font-family: roboto;
-	font-size: 16px;
+	font-size: 15px;
 	line-height: 40px;
 	padding-left: 10px;
 	opacity: .4;
 
 	overflow: hidden;
+}
+
+.fade_out{
+	animation-name: fade_item;
+	animation-fill-mode: forwards;
+	animation-duration: 1s;
+}
+
+.fade_in{
+	animation-name: fade_item;
+	animation-direction: reverse;
+	animation-fill-mode: forwards;
+	animation-duration: .3s;
 }
 
 .selected{
@@ -111,6 +125,15 @@ html, body{
 	position: absolute;
 	width: 0;
 	height: 0;
+}
+
+@keyframes fade_item{
+	from{
+		opacity: .4;
+	}
+	to{
+		opacity: 0;
+	}
 }
 
 @font-face{
