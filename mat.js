@@ -1,4 +1,4 @@
-//4d matrix object constructor
+//4x4 matrix object constructor
 var Mat4 = function(){
 	this.e = new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
 }
