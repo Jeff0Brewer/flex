@@ -6,7 +6,7 @@ class Matrix_Rain{
 		this.len = len;
 		this.warp = 0;
 
-		let s = .025;
+		let s = .03;
 		this.symbols = [[-.5*s,s,0, .5*s,s,0,
 						 -.5*s,s,0, 0,-s,0,
 						 .5*s,s,0, 0,-s,0],
@@ -16,7 +16,7 @@ class Matrix_Rain{
 		this.sym_len = this.symbols[0].length;
 		this.offsets = [];
 		for(let i = 0; i < len; i++){
-			this.offsets.push(exp_map(i, [0, len], [.1, .03], .2));
+			this.offsets.push(exp_map(i, [0, len], [.07, .005], .5));
 		}
 
 		let vertex_length = num*len*this.sym_len;
@@ -32,7 +32,7 @@ class Matrix_Rain{
 		this.st_b = [25, 100];
 
 		let r_b = [1.5, 10];
-		let a_b = [0, Math.PI*2];
+		let a_b = [Math.PI*.8, Math.PI*2.4];
 		let h_b = [7, -7];
 		let pos_ind = 0;
 		let buf_ind = 0;
@@ -133,8 +133,8 @@ class Matrix_Rain{
 				this.strands[i][2] = 0;
 				this.strands[i][0] = (this.strands[i][0] + 1) % this.len;
 				for(let j = 0; j < this.len; j++){
-					let d = this.strands[i][0] - j > 0 ? this.strands[i][0] - j : this.strands[i][0] + this.len - j;
-					let opacity = exp_map(d, [0, this.len/2], [.75, 0], .4);
+					let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + this.len - j;
+					let opacity = exp_map(d, [0, this.len/2], [.55, 0], .8);
 					let vertex_start = (i*this.len + j)*vpl;
 					for(let k = 0; k < vpl; k++){
 						this.opc_buffer[vertex_start + k] = opacity;
