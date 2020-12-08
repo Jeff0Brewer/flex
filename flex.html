@@ -74,9 +74,9 @@
 
 		void main(){
 			vec4 pos = a_Position + vec4(a_Acos*a_Offset, 0.0, a_Asin*a_Offset, 0.0);
-			float warp_amount = .2;
+			float warp_amount = .3;
 			if(length(pos)/10.0 < u_Warp*0.75){
-				warp_amount = .7;
+				warp_amount = .8;
 			}
 			pos = vec4(pos.xyz + normalize(pos.xyz)*u_Warp*warp_amount*pow(length(pos.xyz)/10.0, .25), pos.w);
 			gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * pos;
