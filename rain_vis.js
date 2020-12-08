@@ -5,6 +5,9 @@ class Matrix_Rain{
 		this.num = num;
 		this.len = len;
 		this.warp = 0;
+		this.rotation = 0;
+		this.rot_time = 0;
+		this.switch_time = 0;
 
 		let s = .03;
 		this.symbols = [[-.5*s,s,0, .5*s,s,0,
@@ -13,6 +16,11 @@ class Matrix_Rain{
 						[-.5*s,s,0, .5*s,s,0,
 						 -.5*s,-s,0, .5*s,-s,0,
 						 0,s,0, 0,-s,0]];
+		this.switch = [];
+		this.switch.push(add(mult_scalar(this.symbols[0], 1.0), mult_scalar(this.symbols[1], -1.0)));
+		this.switch.push(add(mult_scalar(this.symbols[0], -1.0), mult_scalar(this.symbols[1], 1.0)));
+		console.log(this.switch)
+
 		this.sym_len = this.symbols[0].length;
 		this.offsets = [];
 		for(let i = 0; i < len; i++){
@@ -23,16 +31,15 @@ class Matrix_Rain{
 		this.pos_buffer = new Float32Array(vertex_length*this.p_fpv);
 		this.off_buffer = new Float32Array(vertex_length);
 		this.opc_buffer = new Float32Array(vertex_length);
-		this.cos_buffer = new Float32Array(vertex_length);
-		this.sin_buffer = new Float32Array(vertex_length);
+		this.ang_buffer = new Float32Array(vertex_length);
 		this.fsize = this.pos_buffer.BYTES_PER_ELEMENT;
 
 		this.strands = [];
 		this.curr_sym = [];
 		this.st_b = [40, 120];
 
-		let r_b = [1.5, 7];
-		let a_b = [Math.PI*.65, Math.PI*2.45];
+		let r_b = [1.5, 7]; 
+		let a_b = [Math.PI*.6, Math.PI*2.4];
 		let h_b = [7, -7];
 		let pos_ind = 0;
 		let buf_ind = 0;
@@ -43,7 +50,7 @@ class Matrix_Rain{
 			let pos = [Math.cos(a)*r, 0, Math.sin(a)*r];
 			for(let l = 0; l < len; l++){
 				let center_pos = add(pos, [0, map(l, [0, len], h_b), 0]);
-				let angle = map(l, [0, len], [0, Math.PI*8]);
+				let angle = map(l, [0, len], [0, Math.PI*10]);
 				for(let p = 0; p < 2; p++){
 					let symbol = Math.random() < .5 ? 0 : 1;
 					this.curr_sym.push(symbol);
@@ -55,8 +62,7 @@ class Matrix_Rain{
 
 						this.off_buffer[buf_ind] = p == 0 ? -.03 : .03;
 						this.opc_buffer[buf_ind] = 0;
-						this.cos_buffer[buf_ind] = Math.cos(angle);
-						this.sin_buffer[buf_ind] = Math.sin(angle);
+						this.ang_buffer[buf_ind] = angle;
 					}
 				}
 			}
@@ -83,21 +89,15 @@ class Matrix_Rain{
 		gl.vertexAttribPointer(this.a_Opacity, 1, gl.FLOAT, false, this.fsize, 0);
 		gl.enableVertexAttribArray(this.a_Opacity);
 
-		this.gl_cos_buf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_cos_buf);
-		gl.bufferData(gl.ARRAY_BUFFER, this.cos_buffer, gl.STATIC_DRAW);
-		this.a_Acos = gl.getAttribLocation(gl.program, 'a_Acos');
-		gl.vertexAttribPointer(this.a_Acos, 1, gl.FLOAT, false, this.fsize, 0);
-		gl.enableVertexAttribArray(this.a_Acos);
-
-		this.gl_sin_buf = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_sin_buf);
-		gl.bufferData(gl.ARRAY_BUFFER, this.sin_buffer, gl.STATIC_DRAW);
-		this.a_Asin = gl.getAttribLocation(gl.program, 'a_Asin');
-		gl.vertexAttribPointer(this.a_Asin, 1, gl.FLOAT, false, this.fsize, 0);
-		gl.enableVertexAttribArray(this.a_Asin);
+		this.gl_ang_buf = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_ang_buf);
+		gl.bufferData(gl.ARRAY_BUFFER, this.ang_buffer, gl.STATIC_DRAW);
+		this.a_Angle = gl.getAttribLocation(gl.program, 'a_Angle');
+		gl.vertexAttribPointer(this.a_Angle, 1, gl.FLOAT, false, this.fsize, 0);
+		gl.enableVertexAttribArray(this.a_Angle);
 
 		this.u_Warp = gl.getUniformLocation(gl.program, 'u_Warp');
+		this.u_Rotation = gl.getUniformLocation(gl.program, 'u_Rotation');
 	}
 
 	draw(){
@@ -105,11 +105,8 @@ class Matrix_Rain{
 		gl.bufferData(gl.ARRAY_BUFFER, this.pos_buffer, gl.STATIC_DRAW);
 		gl.vertexAttribPointer(this.a_Position, this.p_fpv, gl.FLOAT, false, this.fsize*this.p_fpv, 0);
 		
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_cos_buf);
-		gl.vertexAttribPointer(this.a_Acos, 1, gl.FLOAT, false, this.fsize, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_sin_buf);
-		gl.vertexAttribPointer(this.a_Asin, 1, gl.FLOAT, false, this.fsize, 0);
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_ang_buf);
+		gl.vertexAttribPointer(this.a_Angle, 1, gl.FLOAT, false, this.fsize, 0);
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.gl_off_buf);
 		gl.bufferData(gl.ARRAY_BUFFER, this.off_buffer, gl.DYNAMIC_DRAW);
@@ -119,14 +116,19 @@ class Matrix_Rain{
 		gl.bufferData(gl.ARRAY_BUFFER, this.opc_buffer, gl.DYNAMIC_DRAW);
 		gl.vertexAttribPointer(this.a_Opacity, 1, gl.FLOAT, false, this.fsize, 0);
 
+		gl.uniform1f(this.u_Warp, this.warp);
+		gl.uniform1f(this.u_Rotation, this.rotation);
 		gl.drawArrays(gl.LINES, 0, this.pos_buffer.length / this.p_fpv);
 	}
 
 	update(elapsed, fft){
 		this.warp = this.warp*.7 + exp_map(fft.sub_pro(0, .125), [0, 255], [0, 1], 2)*.3;
-		gl.uniform1f(this.u_Warp, this.warp);
-		let f_b = [.2, .8];
 
+		let rot_spd = 5000;
+		this.rot_time = (this.rot_time + elapsed) % rot_spd;
+		this.rotation = map(this.rot_time, [0, rot_spd], [0, Math.PI*2]);
+
+		let f_b = [.2, .8];
 		for(let i = 0; i < this.num; i++){
 			this.strands[i][2] += elapsed;
 			if(this.strands[i][2] > this.strands[i][1]){
@@ -144,6 +146,19 @@ class Matrix_Rain{
 				}
 			}
 		}
+		let switch_lvl = map(fft.sub_pro(0, .15), [0, 255], [0, 1]);
+		for(let i = 0; i < 1000; i++){
+			let sym_ind = Math.floor(map(Math.random(), [0, 1], [0, this.curr_sym.length]))
+			let pos_start = sym_ind*this.sym_len*this.p_fpv;
+			let symbol = Math.random() < switch_lvl ? 1 : 0;
+			if(symbol != this.curr_sym[sym_ind]){
+				for(let j = 0; j < this.switch[symbol].length; j++){
+					this.pos_buffer[pos_start + j] += this.switch[symbol][j];
+				}
+				this.curr_sym[sym_ind] = symbol;
+			}
+		}
+
 	}
 }
 
