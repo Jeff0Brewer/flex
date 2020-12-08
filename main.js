@@ -46,7 +46,7 @@ function main(){
 	switch_shader(0);
 	iso = new Iso(p_fpv);
 	switch_shader(2);
-	mxr = new Matrix_Rain(p_fpv, 125, 100);
+	mxr = new Matrix_Rain(p_fpv, 100, 80);
 	switch_shader(1);
 	fil = new TexFill(2, 2);
 
