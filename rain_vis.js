@@ -16,7 +16,7 @@ class Matrix_Rain{
 		this.sym_len = this.symbols[0].length;
 		this.offsets = [];
 		for(let i = 0; i < len; i++){
-			this.offsets.push(exp_map(i, [0, len], [.07, .005], .5));
+			this.offsets.push(exp_map(i, [0, len], [.08, .005], .25));
 		}
 
 		let vertex_length = num*len*this.sym_len;
@@ -29,17 +29,17 @@ class Matrix_Rain{
 
 		this.strands = [];
 		this.curr_sym = [];
-		this.st_b = [25, 100];
+		this.st_b = [40, 120];
 
-		let r_b = [1.5, 10];
-		let a_b = [Math.PI*.8, Math.PI*2.4];
+		let r_b = [1.5, 7];
+		let a_b = [Math.PI*.65, Math.PI*2.45];
 		let h_b = [7, -7];
 		let pos_ind = 0;
 		let buf_ind = 0;
 		for(let n = 0; n < num; n++){
-			this.strands.push([Math.floor(Math.random()*len), map(Math.random(), [0, 1], this.st_b), Math.random()*this.st_b[0]]);
-			let r = map(Math.random(), [0, 1], r_b);
-			let a = map(Math.random(), [0, 1], a_b);
+			this.strands.push([Math.floor(Math.random()*2*len), map(Math.random(), [0, 1], this.st_b), Math.random()*this.st_b[0]]);
+			let r = map(noise.simplex2(n*.1, 0), [-1, 1], r_b);
+			let a = map(noise.simplex2(n*.4, 0), [-1, 1], a_b);
 			let pos = [Math.cos(a)*r, 0, Math.sin(a)*r];
 			for(let l = 0; l < len; l++){
 				let center_pos = add(pos, [0, map(l, [0, len], h_b), 0]);
@@ -125,21 +125,22 @@ class Matrix_Rain{
 	update(elapsed, fft){
 		this.warp = this.warp*.7 + exp_map(fft.sub_pro(0, .125), [0, 255], [0, 1], 2)*.3;
 		gl.uniform1f(this.u_Warp, this.warp);
+		let f_b = [.2, .8];
 
-		let vpl = 2*this.sym_len/this.p_fpv;
 		for(let i = 0; i < this.num; i++){
 			this.strands[i][2] += elapsed;
 			if(this.strands[i][2] > this.strands[i][1]){
 				this.strands[i][2] = 0;
-				this.strands[i][0] = (this.strands[i][0] + 1) % this.len;
-				for(let j = 0; j < this.len; j++){
-					let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + this.len - j;
-					let opacity = exp_map(d, [0, this.len/2], [.55, 0], .8);
-					let vertex_start = (i*this.len + j)*vpl;
-					for(let k = 0; k < vpl; k++){
-						this.opc_buffer[vertex_start + k] = opacity;
-						this.off_buffer[vertex_start + k] = (k < vpl/2 ? -1 : 1) * this.offsets[d];
-					}
+				this.strands[i][0] = (this.strands[i][0] + 1) % (2*this.len);
+			}
+			let drop_len = map(fft.sub_pro(map(i, [0, this.len], f_b), map(i+1, [0, this.len], f_b)), [0, 255], [this.len*.4, this.len*.9]);
+			for(let j = 0; j < 2*this.len; j++){
+				let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + 2*this.len - j;
+				let opacity = exp_map(d, [0, drop_len], [.65, 0], .8);
+				let vertex_start = (i*2*this.len + j)*this.sym_len;
+				for(let k = 0; k < this.sym_len; k++){
+					this.opc_buffer[vertex_start + k] = opacity;
+					this.off_buffer[vertex_start + k] = (j % 2 == 0 ? -1 : 1) * this.offsets[d];
 				}
 			}
 		}
