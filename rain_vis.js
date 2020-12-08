@@ -45,8 +45,8 @@ class Matrix_Rain{
 		for(let n = 0; n < num; n++){
 			this.strands.push([Math.floor(Math.random()*2*len), map(Math.random(), [0, 1], this.st_b), Math.random()*this.st_b[0]]);
 			let noise_pos = n > num/2 ? n % (num/2) : -n;
-			let r = map(noise.simplex2(n*.1, 0), [-1, 1], r_b);
-			let a = map(noise.simplex2(n*.4, 0), [-1, 1], a_b);
+			let r = map(noise.simplex2(noise_pos*.1, 0), [-1, 1], r_b);
+			let a = map(noise.simplex2(noise_pos*.4, 0), [-1, 1], a_b);
 			let pos = [Math.cos(a)*r, 0, Math.sin(a)*r];
 			for(let l = 0; l < len; l++){
 				let center_pos = add(pos, [0, map(l, [0, len], h_b), 0]);
