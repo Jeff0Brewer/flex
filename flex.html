@@ -6,6 +6,7 @@
 </head>
 <body onload="main()">
 	<canvas class="c" id="c"></canvas>
+	<div class="vignette"></div>
 	<div id="menu" class="menu">
 		<div id="song_list" class="song_list">
 			<div id="item_template" class="menu_item hidden" >
@@ -73,9 +74,9 @@
 
 		void main(){
 			vec4 pos = a_Position + vec4(a_Acos*a_Offset, 0.0, a_Asin*a_Offset, 0.0);
-			float warp_amount = .25;
+			float warp_amount = .2;
 			if(length(pos)/10.0 < u_Warp*0.75){
-				warp_amount = .75;
+				warp_amount = .7;
 			}
 			pos = vec4(pos.xyz + normalize(pos.xyz)*u_Warp*warp_amount*pow(length(pos.xyz)/10.0, .25), pos.w);
 			gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * pos;
@@ -109,7 +110,7 @@
 		varying vec2 v_TexCoord;
 
 		void main(){
-			float max_spray = .2;
+			float max_spray = .25;
 			vec2 dir = v_TexCoord.xy - 0.5;
 			if(length(dir) > max_spray){
 				dir = normalize(dir)*max_spray;
