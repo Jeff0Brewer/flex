@@ -2,7 +2,7 @@
 class Matrix_Rain{
 	constructor(p_fpv, num, len){
 		this.p_fpv = p_fpv;
-		this.num = num;
+		this.num = num + (num % 2);
 		this.len = len;
 		this.warp = 0;
 		this.rotation = 0;
@@ -44,6 +44,7 @@ class Matrix_Rain{
 		let buf_ind = 0;
 		for(let n = 0; n < num; n++){
 			this.strands.push([Math.floor(Math.random()*2*len), map(Math.random(), [0, 1], this.st_b), Math.random()*this.st_b[0]]);
+			let noise_pos = n > num/2 ? n % (num/2) : -n;
 			let r = map(noise.simplex2(n*.1, 0), [-1, 1], r_b);
 			let a = map(noise.simplex2(n*.4, 0), [-1, 1], a_b);
 			let pos = [Math.cos(a)*r, 0, Math.sin(a)*r];
@@ -135,7 +136,7 @@ class Matrix_Rain{
 				this.strands[i][0] = (this.strands[i][0] + 1) % (2*this.len);
 			}
 			let ff = fft.sub_pro(map(i % 10, [0, 10], f_b), map(i % 10, [0, 10], f_b));
-			let drop_len = map(ff, [0, 255], [this.len*.3, this.len*.8]);
+			let drop_len = map(ff, [0, 255], [this.len*.2, this.len*.6]);
 			for(let j = 0; j < 2*this.len; j++){
 				let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + 2*this.len - j;
 				let opacity = d == 0 ? .9 : exp_map(d, [0, drop_len], [.7, 0], .8);
