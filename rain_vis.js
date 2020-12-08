@@ -15,11 +15,10 @@ class Matrix_Rain{
 						 .5*s,s,0, 0,-s,0],
 						[-.5*s,s,0, .5*s,s,0,
 						 -.5*s,-s,0, .5*s,-s,0,
-						 0,s,0, 0,-s,0]];
-		this.switch = [];
-		this.switch.push(add(mult_scalar(this.symbols[0], 1.0), mult_scalar(this.symbols[1], -1.0)));
-		this.switch.push(add(mult_scalar(this.symbols[0], -1.0), mult_scalar(this.symbols[1], 1.0)));
-		console.log(this.switch)
+						 0,s,0, 0,-s,0],
+						 [-.5*s,-s,0, .5*s,-s,0,
+						 -.5*s,-s,0, 0,s,0,
+						 .5*s,-s,0, 0,s,0]];
 
 		this.sym_len = this.symbols[0].length;
 		this.offsets = [];
@@ -52,7 +51,7 @@ class Matrix_Rain{
 				let center_pos = add(pos, [0, map(l, [0, len], h_b), 0]);
 				let angle = map(l, [0, len], [0, Math.PI*10]);
 				for(let p = 0; p < 2; p++){
-					let symbol = Math.random() < .5 ? 0 : 1;
+					let symbol = 0;
 					this.curr_sym.push(symbol);
 					for(let i = 0; i < this.symbols[symbol].length; i++, pos_ind += 3, buf_ind++){
 						let vertex_pos = add(this.symbols[symbol].slice(i*3, i*3+3), center_pos);
@@ -128,32 +127,34 @@ class Matrix_Rain{
 		this.rot_time = (this.rot_time + elapsed) % rot_spd;
 		this.rotation = map(this.rot_time, [0, rot_spd], [0, Math.PI*2]);
 
-		let f_b = [.2, .8];
+		let f_b = [.2, 1];
 		for(let i = 0; i < this.num; i++){
 			this.strands[i][2] += elapsed;
 			if(this.strands[i][2] > this.strands[i][1]){
 				this.strands[i][2] = 0;
 				this.strands[i][0] = (this.strands[i][0] + 1) % (2*this.len);
 			}
-			let drop_len = map(fft.sub_pro(map(i, [0, this.len], f_b), map(i+1, [0, this.len], f_b)), [0, 255], [this.len*.4, this.len*.9]);
+			let ff = fft.sub_pro(map(i % 10, [0, 10], f_b), map(i % 10, [0, 10], f_b));
+			let drop_len = map(ff, [0, 255], [this.len*.3, this.len*.8]);
 			for(let j = 0; j < 2*this.len; j++){
 				let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + 2*this.len - j;
-				let opacity = exp_map(d, [0, drop_len], [.65, 0], .8);
+				let opacity = d == 0 ? .9 : exp_map(d, [0, drop_len], [.7, 0], .8);
 				let vertex_start = (i*2*this.len + j)*this.sym_len;
-				for(let k = 0; k < this.sym_len; k++){
+				for(let k = 0; k < this.sym_len/this.p_fpv; k++){
 					this.opc_buffer[vertex_start + k] = opacity;
 					this.off_buffer[vertex_start + k] = (j % 2 == 0 ? -1 : 1) * this.offsets[d];
 				}
 			}
 		}
-		let switch_lvl = map(fft.sub_pro(0, .15), [0, 255], [0, 1]);
+		let sym_lvl = map(fft.sub_pro(0, .15), [0, 255], [0, this.symbols.length]);
 		for(let i = 0; i < 1000; i++){
-			let sym_ind = Math.floor(map(Math.random(), [0, 1], [0, this.curr_sym.length]))
+			let sym_ind = Math.floor(map(Math.random(), [0, 1], [0, this.curr_sym.length]));
+			let symbol = Math.floor(exp_map(Math.random(), [0, 1] , [0, sym_lvl], .5));
 			let pos_start = sym_ind*this.sym_len*this.p_fpv;
-			let symbol = Math.random() < switch_lvl ? 1 : 0;
+			let transition = add(mult_scalar(this.symbols[symbol], 1.0), mult_scalar(this.symbols[this.curr_sym[sym_ind]], -1.0));
 			if(symbol != this.curr_sym[sym_ind]){
-				for(let j = 0; j < this.switch[symbol].length; j++){
-					this.pos_buffer[pos_start + j] += this.switch[symbol][j];
+				for(let j = 0; j < this.sym_len; j++){
+					this.pos_buffer[pos_start + j] += transition[j];
 				}
 				this.curr_sym[sym_ind] = symbol;
 			}
