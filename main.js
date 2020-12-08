@@ -21,21 +21,32 @@ function main(){
 	//setup gl and uniforms
 	setup_gl();
 	make_tex_fb();
-	switch_shader(0);
-	u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
-	u_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
-	u_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
 
 	fovy = 50;
-	view_matrix.set_camera([0, 0, 7], [0, 0, 0], [0, 1, 0]);
+	view_matrix.set_camera([0, 0, 8], [0, 0, 0], [0, 1, 0]);
 	proj_matrix.set_perspective(fovy, canvas.width/canvas.height, .01, 500);
-	gl.uniformMatrix4fv(u_ModelMatrix, false, model_matrix.e);
-	gl.uniformMatrix4fv(u_ViewMatrix, false, view_matrix.e);
-	gl.uniformMatrix4fv(u_ProjMatrix, false, proj_matrix.e);
+
+	switch_shader(0);
+	iso_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+	iso_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+	iso_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
+	gl.uniformMatrix4fv(iso_ModelMatrix, false, model_matrix.e);
+	gl.uniformMatrix4fv(iso_ViewMatrix, false, view_matrix.e);
+	gl.uniformMatrix4fv(iso_ProjMatrix, false, proj_matrix.e);
+
+	switch_shader(2);
+	mxr_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
+	mxr_ViewMatrix = gl.getUniformLocation(gl.program, 'u_ViewMatrix');
+	mxr_ProjMatrix = gl.getUniformLocation(gl.program, 'u_ProjMatrix');
+	gl.uniformMatrix4fv(mxr_ModelMatrix, false, model_matrix.e);
+	gl.uniformMatrix4fv(mxr_ViewMatrix, false, view_matrix.e);
+	gl.uniformMatrix4fv(mxr_ProjMatrix, false, proj_matrix.e);
 
 	//initialize visualizations
 	switch_shader(0);
 	iso = new Iso(p_fpv);
+	switch_shader(2);
+	mxr = new Matrix_Rain(p_fpv, 125, 100);
 	switch_shader(1);
 	fil = new TexFill(2, 2);
 
@@ -53,16 +64,19 @@ function main(){
 				fft.get_data();
 			}
 			menu.update(elapsed);
-			iso.update(elapsed, fft);
 			
 			switch_fb(1);
-			switch_shader(0);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+			switch_shader(0);
+			iso.update(elapsed, fft);
 			iso.draw();
+			switch_shader(2);
+			mxr.update(elapsed, fft);
+			mxr.draw();
 
 			switch_fb(0);
-			switch_shader(1);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+			switch_shader(1);
 			fil.draw(fft);
 		}
 
@@ -84,11 +98,14 @@ document.body.onmousedown = function(){
 document.body.onresize = function(){
 	canvas.width = window.innerWidth*window.devicePixelRatio;
 	canvas.height = window.innerHeight*window.devicePixelRatio;
+	menu.resize();
 	if(gl){
 		gl.viewport(0, 0, canvas.width, canvas.height);
 		proj_matrix.set_perspective(fovy, canvas.width/canvas.height, .01, 500);
 		switch_shader(0);
-		gl.uniformMatrix4fv(u_ProjMatrix, false, proj_matrix.e);
+		gl.uniformMatrix4fv(iso_ProjMatrix, false, proj_matrix.e);
+		switch_shader(2);
+		gl.uniformMatrix4fv(mxr_ProjMatrix, false, proj_matrix.e);
 		remove_fb(1);
 		make_tex_fb();
 	}
