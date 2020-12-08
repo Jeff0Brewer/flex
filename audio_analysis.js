@@ -21,7 +21,7 @@ FFT.prototype.init_ctx = function(file){
 //change the audio file
 FFT.prototype.change_file = function(file){
 	let play = false;
-	if(this.audio.paused == false){
+	if(this.audio.paused == false || this.audio.currentTime == this.audio.duration){
 		this.audio.pause();
 		play = true;
 	}
@@ -48,6 +48,12 @@ FFT.prototype.get_data = function(){
 FFT.prototype.sub_pro = function(s, e){
 	s = Math.floor(s*this.pro_data.length);
 	e = Math.floor(e*this.pro_data.length);
+	if(s == e){
+		if(s > 0)
+			s--;
+		else
+			e = min(e+1, this.pro_data.length - 1);
+	}
 	let slice = this.pro_data.slice(s, e);
 	let sum = 0;
 	for(let i = 0; i < slice.length; i++)
