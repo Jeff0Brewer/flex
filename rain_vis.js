@@ -23,7 +23,7 @@ class Matrix_Rain{
 		this.sym_len = this.symbols[0].length;
 		this.offsets = [];
 		for(let i = 0; i < len; i++){
-			this.offsets.push(exp_map(i, [0, len], [.08, .005], .25));
+			this.offsets.push(exp_map(i, [0, len], [.1, .005], .25));
 		}
 
 		let vertex_length = num*len*this.sym_len;
@@ -37,7 +37,7 @@ class Matrix_Rain{
 		this.curr_sym = [];
 		this.st_b = [40, 120];
 
-		let r_b = [1.5, 7]; 
+		let r_b = [1.75, 7]; 
 		let a_b = [Math.PI*.6, Math.PI*2.4];
 		let h_b = [7, -7];
 		let pos_ind = 0;
@@ -122,7 +122,7 @@ class Matrix_Rain{
 	}
 
 	update(elapsed, fft){
-		this.warp = this.warp*.7 + exp_map(fft.sub_pro(0, .125), [0, 255], [0, 1], 2)*.3;
+		this.warp = this.warp*.85 + exp_map(fft.sub_pro(0, .1), [0, 255], [0, 1], 2)*.15;
 
 		let rot_spd = 5000;
 		this.rot_time = (this.rot_time + elapsed) % rot_spd;
@@ -135,8 +135,7 @@ class Matrix_Rain{
 				this.strands[i][2] = 0;
 				this.strands[i][0] = (this.strands[i][0] + 1) % (2*this.len);
 			}
-			let ff = fft.sub_pro(map(i % 10, [0, 10], f_b), map(i % 10, [0, 10], f_b));
-			let drop_len = map(ff, [0, 255], [this.len*.2, this.len*.6]);
+			let drop_len = map(fft.sub_pro(map(i % 10, [0, 10], f_b), map(i % 10, [0, 10], f_b)), [0, 255], [this.len*.2, this.len*.5]);
 			for(let j = 0; j < 2*this.len; j++){
 				let d = this.strands[i][0] - j >= 0 ? this.strands[i][0] - j : this.strands[i][0] + 2*this.len - j;
 				let opacity = d == 0 ? .9 : exp_map(d, [0, drop_len], [.7, 0], .8);
