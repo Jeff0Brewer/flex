@@ -28,6 +28,9 @@ side panel						|
 	song name					| DONE
 	song upload					| DONE
 	playlist view				| DONE
+	border around song list		| 
+		collapse animation		|
+	+ -> 'new playlist'			| 
 playlist volume normalization	| 
 perlin noise library	 		| 
 
