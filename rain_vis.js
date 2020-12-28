@@ -98,6 +98,8 @@ class Matrix_Rain{
 		gl.enableVertexAttribArray(this.a_Angle);
 
 		this.u_Warp = gl.getUniformLocation(gl.program, 'u_Warp');
+		gl.uniform3f(gl.getUniformLocation(gl.program, 'u_WarpCurve'), .2, 1.0, .6);
+		
 		this.u_Rotation = gl.getUniformLocation(gl.program, 'u_Rotation');
 	}
 

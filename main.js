@@ -29,7 +29,7 @@ function main(){
 	view_matrix.set_camera([0, 0, 8], [0, 0, 0], [0, 1, 0]);
 	proj_matrix.set_perspective(fovy, canvas.width/canvas.height, .01, 500);
 
-	mvp_shaders = [0, 1];
+	mvp_shaders = [0, 1, 2];
 	for(let i = 0; i < mvp_shaders.length; i++){
 		switch_shader(mvp_shaders[i]);
 		gl.uniformMatrix4fv(gl.getUniformLocation(gl.program, 'u_ModelMatrix'), false, model_matrix.e);
@@ -40,7 +40,8 @@ function main(){
 	//initialize visualizations
 	iso = new Iso(p_fpv, 0);
 	mxr = new Matrix_Rain(p_fpv, 200, 75, 1);
-	fil = new TexFill(2, 2, 2);
+	prt = new Particles(p_fpv, 8, 8, 8, 2);
+	fil = new TexFill(2, 2, 3);
 
 	//start drawing loop
 	let last_t = Date.now();
@@ -65,6 +66,9 @@ function main(){
 
 			mxr.update(elapsed, fft);
 			mxr.draw();
+
+			prt.update(elapsed, fft);
+			prt.draw();
 
 			switch_fb(0);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
