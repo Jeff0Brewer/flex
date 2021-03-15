@@ -10,7 +10,7 @@ class Matrix_Rain{
 		this.switch_time = 0;
 		this.sh = shader_ind;
 
-		let s = .04;
+		let s = .035;
 		this.symbols = [[-.5*s,s,0, .5*s,s,0,
 						 -.5*s,s,0, 0,-s,0,
 						 .5*s,s,0, 0,-s,0],

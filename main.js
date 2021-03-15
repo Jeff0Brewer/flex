@@ -40,7 +40,7 @@ function main(){
 	//initialize visualizations
 	iso = new Iso(p_fpv, 0);
 	mxr = new Matrix_Rain(p_fpv, 200, 75, 1);
-	prt = new Particles(p_fpv, 8, 8, 8, 2);
+	dsk = new Disk(3, 3.1, 150, 2);
 	fil = new TexFill(2, 2, 3);
 
 	//start drawing loop
@@ -61,14 +61,14 @@ function main(){
 			switch_fb(1);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
 
-			iso.update(elapsed, fft);
-			iso.draw();
+			dsk.update(elapsed, fft);
+			dsk.draw();
 
 			mxr.update(elapsed, fft);
 			mxr.draw();
 
-			prt.update(elapsed, fft);
-			prt.draw();
+			iso.update(elapsed, fft);
+			iso.draw();
 
 			switch_fb(0);
 			gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
